@@ -337,8 +337,8 @@ void render() {
   blendMode(MULTIPLY);
   strokeWeight(0.33);
 
-  float screen_wh_ratio = width/height;
-  float camera_wh_ratio = camera_w/camera_h;
+  float screen_wh_ratio = 1.0 * width/height;
+  float camera_wh_ratio = 1.0 * camera_w/camera_h;
   float scale_amount = 0;
   if (camera_wh_ratio > screen_wh_ratio) {
     scale_amount = width / camera_w;
