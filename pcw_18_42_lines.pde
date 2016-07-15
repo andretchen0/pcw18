@@ -341,9 +341,9 @@ void render() {
   float camera_wh_ratio = 1.0 * camera_w/camera_h;
   float scale_amount = 0;
   if (camera_wh_ratio > screen_wh_ratio) {
-    scale_amount = width / camera_w;
+    scale_amount = 1.0 * width/camera_w;
   } else {
-    scale_amount = height / camera_h;
+    scale_amount = 1.0 * height/camera_h;
   }
 
   pushMatrix();
