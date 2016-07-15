@@ -156,7 +156,8 @@ float[] COMMA = {0.25, 0.0, 0.0, -0.2};
 float[] APOSTROPHE = {0.75, 1.0, 0.25, 0.8};
 float[] EXCLAMATION = {0.25, 0.0, 0.25, 0.0, 
   0.25, 0.4, 0.25, 1.0};
-float[] FORWARD_SLASH = {0.0, 0.0, 1.0, 1.0};  
+float[] FORWARD_SLASH = {0.0, 0.0, 1.0, 1.0}; 
+float[] HYPHEN = {0.25, 0.6, 0.75, 0.6};
 
 color[] COLORS = {0xFFA6206A, 0xFFEC1C4B, 0xFFF16A43, 0xFFF2D969, 0xFF2F9395};
 
@@ -177,9 +178,10 @@ float letter_every_x_sec = 0.3;
 float last_letter_rendered_sec = millis() * 0.001;
 int COORDS_PER_LINE = 4;
 
-float LERP_SPEED = 0.1;
-float SHRINK_SEC = 1.0;
-float MOVE_SEC = 2.0;
+float LERP_SPEED = 0.2;
+float CAMERA_SPEED = 0.03;
+float SHRINK_SEC = 0.2;
+float MOVE_SEC = 0.5;
 
 float[] lines_coords = new float[COORDS_PER_LINE * NUM_LINES]; 
 float[] target_coords = new float[COORDS_PER_LINE * NUM_LINES];
@@ -240,6 +242,7 @@ void setup () {
   LETTERS.put("'", APOSTROPHE);  
   LETTERS.put("!", EXCLAMATION);
   LETTERS.put("/", FORWARD_SLASH);
+  LETTERS.put("-", HYPHEN);  
   
   for (int i = 0; i < NUM_LINES; i++) {
     float angle = i * TWO_PI / NUM_LINES;
@@ -276,9 +279,8 @@ void update() {
           target_coords[curr_line_i*4 + 1] = line_coords_for_letter[i+1] + curr_letter_y;
           target_coords[curr_line_i*4 + 2] = line_coords_for_letter[i+2] + curr_letter_x;
           target_coords[curr_line_i*4 + 3] = line_coords_for_letter[i+3] + curr_letter_y;
-          line_created_sec[curr_line_i] = millis() * 0.001;
-          curr_line_i ++;
-          curr_line_i %= NUM_LINES;
+          line_created_sec[curr_line_i] = millis() * 0.001 + i * 0.05;
+          curr_line_i = (curr_line_i + 1) % NUM_LINES;
         }
       }
       curr_letter_x += 1 + KERN_WIDTH;
@@ -326,10 +328,10 @@ void update() {
   target_camera_w = abs(max_x - min_x) + 2 * PADDING;
   target_camera_h = abs(max_y - min_y) + 2 * PADDING;
 
-  camera_x = lerp(camera_x, target_camera_x, LERP_SPEED);
-  camera_y = lerp(camera_y, target_camera_y, LERP_SPEED);
-  camera_w = lerp(camera_w, target_camera_w, LERP_SPEED);
-  camera_h = lerp(camera_h, target_camera_h, LERP_SPEED);
+  camera_x = lerp(camera_x, target_camera_x, CAMERA_SPEED);
+  camera_y = lerp(camera_y, target_camera_y, CAMERA_SPEED);
+  camera_w = lerp(camera_w, target_camera_w, CAMERA_SPEED);
+  camera_h = lerp(camera_h, target_camera_h, CAMERA_SPEED);
 }
 
 void render() {
@@ -337,9 +339,10 @@ void render() {
   blendMode(MULTIPLY);
   strokeWeight(0.33);
 
-  float screen_wh_ratio = 1.0 * width/height;
-  float camera_wh_ratio = 1.0 * camera_w/camera_h;
+  float screen_wh_ratio = 1.0 * width / height;
+  float camera_wh_ratio = 1.0 * camera_w / camera_h;
   float scale_amount = 0;
+  
   if (camera_wh_ratio > screen_wh_ratio) {
     scale_amount = 1.0 * width/camera_w;
   } else {
@@ -355,6 +358,7 @@ void render() {
     stroke(COLORS[i % COLORS.length]);
     line(lines_coords[i], lines_coords[i+1], lines_coords[i+2], lines_coords[i+3]);
   }
+  
   popMatrix();
 }
 
